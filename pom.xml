@@ -118,7 +118,22 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals><goal>javadoc</goal></goals>
+                        <configuration>
+                            <show>package</show>
+                            <outputDirectory>${project.target}/site/apidocs</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.5</version>
                 <configuration>
                     <descriptors>
                         <descriptor>
@@ -137,7 +152,7 @@
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>assembly</goal>
+                            <goal>single</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -177,6 +192,14 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>rpm-maven-plugin</artifactId>
                 <version>2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <license>Apache Software License v2.0</license>
                     <distribution>CyclopsGroup.org</distribution>
@@ -219,18 +242,31 @@
             <plugin>
                 <groupId>org.vafer</groupId>
                 <artifactId>jdeb</artifactId>
-                <version>1.3</version>
+                <version>1.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <controlDir>src/main/deb</controlDir>
                     <dataSet>
                         <data>
                             <type>file</type>
                             <src>target/jmxterm-${project.version}-uber.jar</src>
-                            <dst>/usr/share/jmxterm/jmxterm-uber.jar</dst>
+                            <dst>/usr/share/jmxterm/jmxterm-${project.version}-uber.jar</dst>
                             <mapper>
                                 <type>perm</type>
                                 <filemode>644</filemode>
                             </mapper>
+                        </data>
+                        <data>
+                            <type>link</type>
+                            <linkName>/usr/share/jmxterm/jmxterm-uber.jar</linkName>
+                            <linkTarget>jmxterm-${project.version}-uber.jar</linkTarget>
                         </data>
                         <data>
                             <type>file</type>
@@ -239,6 +275,15 @@
                             <mapper>
                                 <type>perm</type>
                                 <filemode>755</filemode>
+                            </mapper>
+                        </data>
+                        <data>
+                            <type>directory</type>
+                            <src>target/site</src>
+                            <dst>/usr/share/doc/jmxterm</dst>
+                            <mapper>
+                                <type>perm></type>
+                                <filemode>644</filemode>
                             </mapper>
                         </data>
                     </dataSet>
@@ -283,3 +328,4 @@
         </site>
     </distributionManagement>
 </project>
+<!-- vim: set ts=4 sw=4 tw=0 et :-->
